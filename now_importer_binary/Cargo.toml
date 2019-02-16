@@ -1,0 +1,11 @@
+[package]
+name = "now_importer_binary"
+version = "0.1.0"
+authors = ["Mike Engel <mike@mike-engel.com>"]
+edition = "2018"
+
+[dependencies]
+now_importer = { path = "../now_importer" }
+log = "0.4"
+simplelog = "0.5"
+clap = "2"
