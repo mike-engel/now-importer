@@ -1,0 +1,11 @@
+.DS_Store
+Thumbs.db
+
+**/*.rs.bk
+
+target/
+dist/
+now_importer_binary/
+
+/Cargo.toml
+/Cargo.lock

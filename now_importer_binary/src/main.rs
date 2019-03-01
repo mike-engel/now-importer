@@ -15,6 +15,13 @@ fn main() -> Result<(), String> {
                 .takes_value(false),
         )
         .arg(
+            Arg::with_name("NOW_TOKEN")
+                .short("-t")
+                .long("--token")
+                .help("The now authentication token to deploy to now with")
+                .required(false),
+        )
+        .arg(
             Arg::with_name("URL")
                 .help("The URL of your website to import")
                 .required(true)
@@ -23,6 +30,7 @@ fn main() -> Result<(), String> {
         .get_matches();
     let debug = matches.is_present("DEBUG");
     let url = matches.value_of("URL").unwrap();
+    let now_token = matches.value_of("NOW_TOKEN");
     let log_config = Config {
         time: Some(Level::Debug),
         level: Some(Level::Debug),
@@ -36,7 +44,7 @@ fn main() -> Result<(), String> {
         false => TermLogger::init(LevelFilter::Info, log_config).unwrap(),
     };
 
-    match import_website(url) {
+    match import_website(url, now_token) {
         Ok(deploy_url) => {
             info!("Project successully deployed to {}", deploy_url);
 

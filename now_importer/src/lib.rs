@@ -19,19 +19,33 @@ fn create_name(url: &str) -> Result<String, ImportError> {
 
   match parse_result {
     Ok(attributes) => match attributes.host_str() {
-      Some(host) => Ok(host.replace(".", "-").to_owned()),
-      None => Err(ImportError::InvalidUrl),
+      Some(host) => {
+        debug!("Host found on the URL");
+
+        Ok(host.replace(".", "-").to_owned())
+      }
+      None => {
+        debug!("URL has no host");
+
+        Err(ImportError::InvalidUrl)
+      }
     },
-    Err(_) => Err(ImportError::InvalidUrl),
+    Err(_) => {
+      debug!("URL can't be parsed");
+
+      Err(ImportError::InvalidUrl)
+    }
   }
 }
 
 fn build_now_config<S: Into<String>>(name: S) -> String {
-  debug!("creating now config");
+  let usable_name = name.into();
+
+  debug!("creating now config with name {}", usable_name);
 
   let config = json!({
     "version": 2,
-    "name": name.into(),
+    "name": usable_name,
     "builds": [{ "src": "**/*", "use": "@now/static" }]
   });
 
@@ -39,7 +53,7 @@ fn build_now_config<S: Into<String>>(name: S) -> String {
 }
 
 fn download_website(url: &str) -> Result<(), ImportError> {
-  debug!("starting website download");
+  debug!("starting website download for url {}", url);
 
   let wget = Command::new("wget")
     .arg("--recursive")
@@ -54,10 +68,22 @@ fn download_website(url: &str) -> Result<(), ImportError> {
 
   match wget {
     Ok(result) => match result.code() {
-      Some(0) => Ok(()),
-      _ => Err(ImportError::DownloadFailed),
+      Some(0) => {
+        debug!("wget finished website download");
+
+        Ok(())
+      }
+      _ => {
+        debug!("wget exited with non-zero exit code");
+
+        Err(ImportError::DownloadFailed)
+      }
     },
-    Err(_) => Err(ImportError::DownloadFailed),
+    Err(error) => {
+      debug!("wget command failed with error: {}", error);
+
+      Err(ImportError::DownloadFailed)
+    }
   }
 }
 
@@ -65,18 +91,32 @@ fn save_now_config(config: String) -> Result<(), ImportError> {
   debug!("saving now config");
 
   match fs::write("dist/now.json", &config) {
-    Ok(_) => Ok(()),
-    Err(_) => Err(ImportError::InternalError),
+    Ok(_) => {
+      debug!("now config added to dist/");
+
+      Ok(())
+    },
+    Err(error) => {
+      debug!("Failed to save now config to dist/: {}", error);
+
+      Err(ImportError::InternalError)
+    }
   }
 }
 
-fn deploy_site() -> Result<String, ImportError> {
+fn deploy_site(token: Option<&str>) -> Result<String, ImportError> {
   debug!("deploying website to now");
 
   let mut clipboard_ctx: ClipboardContext = ClipboardProvider::new().unwrap();
-  let now = Command::new("now").current_dir("dist").status();
+  let mut now = Command::new("now");
 
-  match now {
+  if let Some(now_token) = token {
+    now.arg(format!("--token=\"{}\"", now_token));
+  }
+
+  let now_status = now.current_dir("dist").status();
+
+  match now_status {
     Ok(result) => match result.code() {
       Some(0) => {
         let deploy_url = clipboard_ctx.get_contents();
@@ -92,7 +132,7 @@ fn deploy_site() -> Result<String, ImportError> {
   }
 }
 
-pub fn import_website(url: &str) -> Result<String, ImportError> {
+pub fn import_website(url: &str, now_token: Option<&str>) -> Result<String, ImportError> {
   let project_name = create_name(url)?;
   let now_config = build_now_config(project_name);
 
@@ -100,7 +140,7 @@ pub fn import_website(url: &str) -> Result<String, ImportError> {
 
   save_now_config(now_config)?;
 
-  let published_url = deploy_site()?;
+  let published_url = deploy_site(now_token)?;
 
   Ok(published_url)
 }
