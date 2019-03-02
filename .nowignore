@@ -6,6 +6,5 @@ Thumbs.db
 target/
 dist/
 now_importer_binary/
-
-/Cargo.toml
-/Cargo.lock
+now_importer/
+now_importer_lambda/

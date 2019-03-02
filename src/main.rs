@@ -1,5 +1,7 @@
+mod importer;
+
+use crate::importer::{import_website, ImportError};
 use http::StatusCode;
-use now_importer::{import_website, ImportError};
 use now_lambda::{error::NowError, lambda, Body, IntoResponse, Request, Response};
 use serde::{Deserialize, Serialize};
 use serde_json::{from_str, to_string};

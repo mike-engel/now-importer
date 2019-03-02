@@ -3,9 +3,8 @@
   "name": "now-importer",
   "builds": [
     {
-      "src": "/now_importer_lambda/Cargo.toml",
-      "use": "@now/rust@canary",
-      "config": { "newPipeline": true }
+      "src": "Cargo.toml",
+      "use": "@now/rust@canary"
     }
   ],
   "routes": [

@@ -1,7 +1,16 @@
-[workspace]
+[package]
+name = "now_importer_lambda"
+version = "0.1.0"
+authors = ["Mike Engel <mike@mike-engel.com>"]
+edition = "2018"
 
-members = [
-  "now_importer",
-  "now_importer_lambda",
-  "now_importer_binary",
-]
+[dependencies]
+http = "0.1"
+lambda_runtime = "0.2"
+now_lambda = "0.1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+url = "1"
+log = "0.4"
+simplelog = "0.5"
+regex = "1"

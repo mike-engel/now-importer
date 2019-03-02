@@ -1,5 +1,5 @@
-use clipboard::{ClipboardContext, ClipboardProvider};
 use log::debug;
+use regex::Regex;
 use serde_json::{json, to_string_pretty};
 use std::fs;
 use std::process::Command;
@@ -95,7 +95,7 @@ fn save_now_config(config: String) -> Result<(), ImportError> {
       debug!("now config added to dist/");
 
       Ok(())
-    },
+    }
     Err(error) => {
       debug!("Failed to save now config to dist/: {}", error);
 
@@ -107,27 +107,33 @@ fn save_now_config(config: String) -> Result<(), ImportError> {
 fn deploy_site(token: Option<&str>) -> Result<String, ImportError> {
   debug!("deploying website to now");
 
-  let mut clipboard_ctx: ClipboardContext = ClipboardProvider::new().unwrap();
   let mut now = Command::new("now");
 
   if let Some(now_token) = token {
     now.arg(format!("--token=\"{}\"", now_token));
   }
 
-  let now_status = now.current_dir("dist").status();
+  let now_output = now.current_dir("dist").output();
+  let url_regex = Regex::new(r"\b(https://.+\.now\.sh)\b").unwrap();
 
-  match now_status {
-    Ok(result) => match result.code() {
-      Some(0) => {
-        let deploy_url = clipboard_ctx.get_contents();
-
-        match deploy_url {
-          Ok(url) => Ok(url),
-          Err(_) => Err(ImportError::DeployFailed),
-        }
+  match now_output {
+    Ok(result) => {
+      if !result.status.success() {
+        return Err(ImportError::DeployFailed);
       }
-      _ => Err(ImportError::DeployFailed),
-    },
+
+      match url_regex.captures(&String::from_utf8(result.stdout).unwrap()) {
+        Some(matches) => {
+          let deploy_url = matches.get(1);
+
+          match deploy_url {
+            Some(url) => Ok(url.as_str().to_owned()),
+            None => Err(ImportError::DeployFailed),
+          }
+        }
+        _ => Err(ImportError::DeployFailed),
+      }
+    }
     Err(_) => Err(ImportError::DeployFailed),
   }
 }
