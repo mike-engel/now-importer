@@ -73,10 +73,10 @@ fn download_website(url: &str, destination: &str) -> Result<(), ImportError> {
     .arg("--no-clobber")
     .arg("--page-requisites")
     .arg("--tries=3")
-    .arg(format!("--directory-prefix={}/", destination))
     .arg("--no-host-directories")
     .arg("--quiet")
     .arg(url)
+    .current_dir(destination)
     .status();
 
   match wget {

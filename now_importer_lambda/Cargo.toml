@@ -13,3 +13,7 @@ url = "1"
 log = "0.4"
 simplelog = "0.5"
 now_importer = { path = "../now_importer" }
+
+[[bin]]
+name = "now_importer_lambda"
+path = "src/main.rs"

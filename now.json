@@ -11,7 +11,7 @@
     {
       "src": "/",
       "methods": ["POST"],
-      "dest": "now_importer_lambda"
+      "dest": "now_importer_lambda/now_importer_lambda"
     }
   ]
 }

@@ -10,3 +10,7 @@ serde_json = "1"
 url = "1"
 log = "0.4"
 regex = "1"
+
+[lib]
+name = "now_importer"
+path = "src/lib.rs"
