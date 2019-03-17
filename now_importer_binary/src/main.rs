@@ -44,17 +44,15 @@ fn main() -> Result<(), String> {
         false => TermLogger::init(LevelFilter::Info, log_config).unwrap(),
     };
 
-    match import_website(url, now_token) {
+    match import_website(url, now_token, "./dist") {
         Ok(deploy_url) => {
             info!("Project successully deployed to {}", deploy_url);
 
             Ok(())
-        }
-        Err(error) => match error {
-            ImportError::DeployFailed => Err(String::from("Deploying to now failed. Try again!")),
-            ImportError::DownloadFailed => Err(String::from("Download failed. Try again!")),
-            ImportError::InternalError => Err(String::from("Something went wrong")),
-            ImportError::InvalidUrl => Err(String::from("Invalid URL. Try again!")),
         },
+        Err(ImportError::DeployFailed(_)) => Err(String::from("Deploying to now failed. Try again!")),
+        Err(ImportError::DownloadFailed(_)) => Err(String::from("Download failed. Try again!")),
+        Err(ImportError::InternalError(_)) => Err(String::from("Something went wrong")),
+        Err(ImportError::InvalidUrl(_)) => Err(String::from("Invalid URL. Try again!")),
     }
 }

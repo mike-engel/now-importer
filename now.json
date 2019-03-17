@@ -3,15 +3,15 @@
   "name": "now-importer",
   "builds": [
     {
-      "src": "Cargo.toml",
-      "use": "@now/rust@canary"
+      "src": "now_importer_lambda/Cargo.toml",
+      "use": "@now/rust"
     }
   ],
   "routes": [
     {
       "src": "/",
       "methods": ["POST"],
-      "dest": "now_importer_binary"
+      "dest": "now_importer_lambda"
     }
   ]
 }

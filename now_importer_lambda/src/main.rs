@@ -1,6 +1,4 @@
-mod importer;
-
-use crate::importer::{import_website, ImportError};
+use now_importer::{import_website, ImportError};
 use http::StatusCode;
 use now_lambda::{error::NowError, lambda, Body, IntoResponse, Request, Response};
 use serde::{Deserialize, Serialize};
