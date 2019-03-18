@@ -19,6 +19,7 @@ fn main() -> Result<(), String> {
                 .short("-t")
                 .long("--token")
                 .help("The now authentication token to deploy to now with")
+                .takes_value(true)
                 .required(false),
         )
         .arg(
@@ -44,7 +45,7 @@ fn main() -> Result<(), String> {
         false => TermLogger::init(LevelFilter::Info, log_config).unwrap(),
     };
 
-    match import_website(url, now_token, "./dist") {
+    match import_website(url, now_token, "", "./dist") {
         Ok(deploy_url) => {
             info!("Project successully deployed to {}", deploy_url);
 

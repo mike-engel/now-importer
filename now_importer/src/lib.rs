@@ -119,21 +119,23 @@ fn save_now_config(config: String, destination: &str) -> Result<(), ImportError>
   }
 }
 
-fn deploy_site(token: Option<&str>, destination: &str) -> Result<String, ImportError> {
+fn deploy_site(token: Option<&str>, config_dir: &str, destination: &str) -> Result<String, ImportError> {
   debug!("deploying website to now");
 
   let mut now = Command::new("now");
 
   if let Some(now_token) = token {
-    now.arg(format!("--token=\"{}\"", now_token));
+    now.arg(format!("--token={}", now_token));
   }
 
-  let now_output = now.current_dir(destination).output();
+  let now_output = now.current_dir(destination).arg(format!("--global-config={}", config_dir)).output();
   let url_regex = Regex::new(r"\b(https://.+\.now\.sh)\b").unwrap();
 
   match now_output {
     Ok(result) => {
       if !result.status.success() {
+        debug!("now cli failed with the following code and output: `{:?}` {:?}", result.status.code().unwrap_or(1), String::from_utf8(result.stderr));
+
         return Err(ImportError::DeployFailed(Some(
           "now exited with a non-zero exit code".to_owned(),
         )));
@@ -182,7 +184,7 @@ fn cleanup(destination: &str) -> Result<(), ImportError> {
   }
 }
 
-pub fn import_website(url: &str, now_token: Option<&str>, folder_path: &str) -> Result<String, ImportError> {
+pub fn import_website(url: &str, now_token: Option<&str>, now_config_directory: &str, folder_path: &str) -> Result<String, ImportError> {
   let project_name = create_name(url)?;
   let destination_dir = format!("{}/{}", folder_path, &project_name);
   let now_config = build_now_config(&project_name);
@@ -193,7 +195,7 @@ pub fn import_website(url: &str, now_token: Option<&str>, folder_path: &str) -> 
 
   save_now_config(now_config, &destination_dir)?;
 
-  let published_url = deploy_site(now_token, &destination_dir)?;
+  let published_url = deploy_site(now_token, now_config_directory, &destination_dir)?;
 
   cleanup(&destination_dir)?;
 

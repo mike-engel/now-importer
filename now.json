@@ -4,7 +4,8 @@
   "builds": [
     {
       "src": "now_importer_lambda/Cargo.toml",
-      "use": "@now/rust"
+      "use": "https://mike-now-rust-5shu849in.now.sh",
+      "config": { "include": "static/*", "maxLambdaSize": "50mb" }
     }
   ],
   "routes": [

@@ -5,6 +5,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::{from_str, to_string};
 use simplelog::{Config, Level, LevelFilter, SimpleLogger};
 use std::error::Error;
+use std::env;
+use std::process::Command;
+use std::path::PathBuf;
 
 #[derive(Deserialize, Debug)]
 struct RequestData {
@@ -27,6 +30,21 @@ const LOG_CONFIG: Config = Config {
     time_format: Some("%T"),
 };
 
+fn setup_path() -> Result<(), Box<dyn Error>> {
+    let existing_path = env::var("PATH")?;
+    let mut existing_paths = env::split_paths(&existing_path).collect::<Vec<_>>();
+    let current_dir = env::current_dir()?;
+    let static_path = format!("{}/static", current_dir.display());
+
+    existing_paths.push(PathBuf::from(static_path));
+
+    let new_path = env::join_paths(existing_paths)?;
+
+    env::set_var("PATH", &new_path);
+
+    Ok(())
+}
+
 fn error_response<E: std::fmt::Debug>(message: &str, debug: bool, error: E) -> ResponseData {
     let error_message = match debug {
         true => format!("{}: {:?}", message, error),
@@ -42,7 +60,7 @@ fn error_response<E: std::fmt::Debug>(message: &str, debug: bool, error: E) -> R
 fn handler(req: Request) -> Result<impl IntoResponse, NowError> {
     match req.body() {
         Body::Text(body) => match from_str(body) {
-            Ok(RequestData { url, debug, token }) => match import_website(&url, Some(&token), "/tmp/dist") {
+            Ok(RequestData { url, debug, token }) => match import_website(&url, Some(&token), "/tmp/.now", "/tmp/dist") {
                 Ok(published_url) => {
                     let response_data = ResponseData {
                         url: Some(published_url.to_owned()),
@@ -109,6 +127,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         Ok(_) => {}
         Err(error) => eprintln!("Error setting up SimpleLogger: {:?}", error),
     };
+
+    setup_path()?;
 
     Ok(lambda!(handler))
 }
