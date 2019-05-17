@@ -1,6 +1,6 @@
 [package]
 name = "now_importer_lambda"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Mike Engel <mike@mike-engel.com>"]
 edition = "2018"
 
@@ -13,6 +13,7 @@ url = "1"
 log = "0.4"
 simplelog = "0.5"
 now_importer = { path = "../now_importer" }
+reqwest = "0.9"
 
 [[bin]]
 name = "now_importer_lambda"

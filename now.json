@@ -1,16 +1,40 @@
 {
   "version": 2,
   "name": "now-importer",
+  "env": {
+    "CLIENT_ID": "@importer-client-id",
+    "CLIENT_SECRET": "@importer-client-secret",
+    "REDIRECT_URI": "@importer-redirect-uri"
+  },
+  "build": {
+    "env": {
+      "CLIENT_ID": "@importer-client-id",
+      "CLIENT_SECRET": "@importer-client-secret",
+      "REDIRECT_URI": "@importer-redirect-uri"
+    }
+  },
   "builds": [
     {
       "src": "now_importer_lambda/Cargo.toml",
-      "use": "https://mike-now-rust-5shu849in.now.sh",
-      "config": { "include": "static/*", "maxLambdaSize": "50mb" }
+      "use": "@now/rust",
+      "config": { "includeFiles": ["static/*"], "maxLambdaSize": "50mb" }
+    },
+    {
+      "src": "ui/next.config.js",
+      "use": "@now/next"
     }
   ],
   "routes": [
     {
       "src": "/",
+      "dest": "ui/index"
+    },
+    {
+      "src": "/_next/(.*)",
+      "dest": "ui/_next/$1"
+    },
+    {
+      "src": "/import",
       "methods": ["POST"],
       "dest": "now_importer_lambda/now_importer_lambda"
     }
