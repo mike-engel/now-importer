@@ -27,16 +27,16 @@
   "routes": [
     {
       "src": "/",
-      "dest": "ui/index"
+      "dest": "/ui/index"
     },
     {
       "src": "/_next/(.*)",
-      "dest": "ui/_next/$1"
+      "dest": "/ui/_next/$1"
     },
     {
       "src": "/import",
       "methods": ["POST"],
-      "dest": "now_importer_lambda/now_importer_lambda"
+      "dest": "/now_importer_lambda/now_importer_lambda"
     }
   ]
 }

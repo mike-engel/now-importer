@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import Head from "next/head";
-import { Heading, Text, fontFamily } from "../components/typography";
+import { Heading, Text, fontFamily, Link } from "../components/typography";
 import { Button } from "../components/button";
 import { lightGrey } from "../components/color";
 import { Input } from "../components/form";
@@ -157,7 +157,10 @@ const FeedbackMessage = ({ error, data }) => {
   if (!!data) {
     return (
       <Text>
-        Success! Your website should now be available at <Link href={data}>{data}</Link>
+        Success! Your website should now be available at{" "}
+        <Link href={`https://${data}`} target="_blank">
+          {data}
+        </Link>
       </Text>
     );
   }
@@ -238,6 +241,10 @@ const Index = styled(RawIndex)`
   width: 100%;
   max-width: 500px;
   margin: 10vh auto;
+
+  [aria-live="polite"] ${Text} {
+    margin-bottom: ${spacing(2)}px;
+  }
 `;
 
 export default Index;
