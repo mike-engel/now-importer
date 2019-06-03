@@ -11,8 +11,8 @@ use std::iter::Iterator;
 use std::path::Path;
 
 const UPLOAD_URL: &'static str = "https://api.zeit.co/v2/now/files";
-const DEPLOY_URL: &'static str = "https://api.zeit.co/v8/now/deployments";
-const DEPLOYMENT_URL: &'static str = "https://api.zeit.co/v8/now/deployments/";
+const DEPLOY_URL: &'static str = "https://api.zeit.co/v9/now/deployments";
+const DEPLOYMENT_URL: &'static str = "https://api.zeit.co/v9/now/deployments/";
 
 #[derive(Debug, Deserialize, Serialize)]
 pub(crate) struct NowFile {
@@ -45,7 +45,8 @@ fn build_now_config(name: &str, files: Vec<NowFile>) -> String {
     "name": name,
     "builds": [{ "src": "**/*", "use": "@now/static" }],
     "files": files,
-    "target": "staging"
+    "target": "staging",
+    "meta": { "imported": "true" }
   });
 
   to_string(&config).unwrap()

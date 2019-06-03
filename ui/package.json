@@ -1,23 +1,33 @@
 {
   "name": "now-importer-ui",
   "version": "0.1.0",
-  "description": "The UI for now-importer",
-  "main": "index.js",
+  "description": "The UI for the now importer marketplace integration",
+  "main": "lib/index.js",
   "scripts": {
-    "dev": "next",
-    "build": "next build",
-    "start": "next start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Mike Engel <mike@mike-engel.com>",
   "license": "UNLICENSED",
+  "volta": {
+    "node": "10.16.0"
+  },
   "dependencies": {
-    "babel-plugin-styled-components": "^1.10.0",
-    "cookie": "^0.3.1",
-    "next": "^8.1.0",
-    "ramda": "^0.26.1",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "styled-components": "^4.2.0"
+    "@zeit/integration-utils": "^0.6.1",
+    "node-fetch": "^2.6.0",
+    "normalize-url": "^4.3.0",
+    "true-myth": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node-fetch": "^2.3.4",
+    "husky": "^2.3.0",
+    "lint-staged": "^8.1.7",
+    "prettier": "^1.17.1",
+    "typescript": "^3.5.1"
+  },
+  "lint-staged": {
+    "*.tsx?": [
+      "prettier --write",
+      "git add"
+    ]
   }
 }

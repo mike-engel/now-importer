@@ -6,6 +6,7 @@
     "CLIENT_SECRET": "@importer-client-secret",
     "REDIRECT_URI": "@importer-redirect-uri"
   },
+  "alias": ["now-importer.now.sh"],
   "build": {
     "env": {
       "CLIENT_ID": "@importer-client-id",
@@ -15,28 +16,32 @@
   },
   "builds": [
     {
-      "src": "now_importer_lambda/Cargo.toml",
-      "use": "@now/rust",
+      "src": "/now_importer_lambda/Cargo.toml",
+      "use": "@now/rust@canary",
       "config": { "includeFiles": ["static/*"], "maxLambdaSize": "50mb" }
     },
     {
-      "src": "ui/next.config.js",
-      "use": "@now/next"
+      "src": "/ui/index.ts",
+      "use": "@now/node"
+    },
+    {
+      "src": "/previews/*",
+      "use": "@now/static"
     }
   ],
   "routes": [
     {
-      "src": "/",
-      "dest": "/ui/index"
-    },
-    {
-      "src": "/_next/(.*)",
-      "dest": "/ui/_next/$1"
+      "src": "/ui",
+      "dest": "/ui/index.ts"
     },
     {
       "src": "/import",
       "methods": ["POST"],
       "dest": "/now_importer_lambda/now_importer_lambda"
+    },
+    {
+      "src": "/static/(.+)",
+      "dest": "/previews/$1"
     }
   ]
 }
