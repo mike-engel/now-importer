@@ -12,8 +12,13 @@ export const verifyUrl = (url: Maybe<string>): Result<string, string> =>
     }
   });
 
-export const extractProjectName = (url: string, username: string) => {
-  return url.replace(`.${username}.now.sh`, "");
+export const extractProjectName = (url: string) => {
+  const re = new RegExp(`(.+)[-\.][A-z0-9]*\.now\.sh`);
+  const matches = url.match(re);
+
+  if (!matches || !matches.length) return url;
+
+  return matches[1];
 };
 
 export const extractDeployId = (url: string, deployName: string) => {
@@ -28,7 +33,7 @@ export const extractDeployId = (url: string, deployName: string) => {
 export const fqdn = (url: string) => normalizeUrl(url, { forceHttps: true, stripWWW: false });
 
 export const projectUrl = (url: string, username: string) =>
-  `https://zeit.co/${username}/${extractProjectName(url, username)}`;
+  `https://zeit.co/${username}/${extractProjectName(url)}`;
 
 export const deploymentUrl = (url: string, name: string, username: string) =>
   `https://zeit.co/${username}/${name}/${extractDeployId(url, name)}`;
