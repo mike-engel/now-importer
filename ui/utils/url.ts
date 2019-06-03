@@ -4,7 +4,7 @@ import normalizeUrl from "normalize-url";
 export const verifyUrl = (url: Maybe<string>): Result<string, string> =>
   url.mapOr(Result.err("A URL must be provided"), unwrappedUrl => {
     try {
-      const parsedUrl = normalizeUrl(unwrappedUrl);
+      const parsedUrl = normalizeUrl(unwrappedUrl, { stripWWW: false });
 
       return Result.ok(parsedUrl);
     } catch (_) {
@@ -25,7 +25,7 @@ export const extractDeployId = (url: string, deployName: string) => {
   return matches[1];
 };
 
-export const fqdn = (url: string) => normalizeUrl(url, { forceHttps: true });
+export const fqdn = (url: string) => normalizeUrl(url, { forceHttps: true, stripWWW: false });
 
 export const projectUrl = (url: string, username: string) =>
   `https://zeit.co/${username}/${extractProjectName(url, username)}`;

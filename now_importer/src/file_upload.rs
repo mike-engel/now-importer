@@ -1,5 +1,4 @@
 use crate::ImportError;
-use base64::encode;
 use log::{debug, error};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
@@ -22,7 +21,7 @@ pub(crate) struct NowFile {
   pub sha: String,
   pub size: usize,
   #[serde(skip_serializing)]
-  pub content: String,
+  pub content: Vec<u8>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -96,7 +95,7 @@ pub(crate) fn collect_files(path: &Path, base: &Path) -> Result<Vec<NowFile>, Im
         }
 
         let mut reader = BufReader::new(file.unwrap());
-        let mut contents = String::new();
+        let mut contents = Vec::new();
         let mut hasher = Sha1::new();
 
         let formatted_path = format!(
@@ -115,7 +114,7 @@ pub(crate) fn collect_files(path: &Path, base: &Path) -> Result<Vec<NowFile>, Im
 
         debug!("formatted_path: {:?}", formatted_path);
 
-        match reader.read_to_string(&mut contents) {
+        match reader.read_to_end(&mut contents) {
           Ok(_) => {
             hasher.input(&contents);
 
@@ -129,33 +128,13 @@ pub(crate) fn collect_files(path: &Path, base: &Path) -> Result<Vec<NowFile>, Im
               sha: format!("{:x}", hash_result),
             }])
           }
-          Err(_) => {
-            let mut contents = Vec::new();
+          Err(err) => {
+            debug!("Unable to read deployment file into memory: {:?}", err);
 
-            let read_result = reader.read_to_end(&mut contents);
-
-            if let Err(err) = read_result {
-              debug!("Unable to read deployment file into memory: {:?}", err);
-
-              return Err(ImportError::DownloadFailed(Some(format!(
-                "Unable to read deployment file into memory: {:?}",
-                err
-              ))));
-            }
-
-            hasher.input(&contents);
-
-            let encoded = encode(&contents);
-
-            let hash_result = hasher.result();
-
-            Ok(vec![NowFile {
-              file: formatted_path,
-              filename: filename,
-              size: contents.len(),
-              content: encoded,
-              sha: format!("{:x}", hash_result),
-            }])
+            return Err(ImportError::DownloadFailed(Some(format!(
+              "Unable to read deployment file into memory: {:?}",
+              err
+            ))));
           }
         }
       })
@@ -208,8 +187,6 @@ pub(crate) fn create_deployment(
 ) -> Result<(String, String), ImportError> {
   let client = Client::new();
   let config = build_now_config(name, files);
-
-  debug!("config: \n\n{:?}\n\n", config);
 
   let create_result = client
     .post(DEPLOY_URL)
