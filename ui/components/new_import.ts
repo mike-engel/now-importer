@@ -4,7 +4,7 @@ import { ImportError } from "./error";
 import { Store } from "../types/store";
 
 type Props = {
-  store: Store;
+	store: Store;
 };
 
 export const NewImport = ({ store }: Props) => htm`

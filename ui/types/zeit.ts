@@ -1,6 +1,6 @@
 export type Deployment = {
-  [key: string]: any;
-  uid: string;
-  name: string;
-  url: string;
+	[key: string]: any;
+	uid: string;
+	name: string;
+	url: string;
 };

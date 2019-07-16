@@ -12,17 +12,23 @@
     "node": "10.16.0"
   },
   "dependencies": {
-    "@zeit/integration-utils": "^0.6.1",
+    "@zeit/integration-utils": "^0.6.4",
     "node-fetch": "^2.6.0",
     "normalize-url": "^4.3.0",
     "true-myth": "^3.0.0"
   },
   "devDependencies": {
-    "@types/node-fetch": "^2.3.4",
-    "husky": "^2.3.0",
-    "lint-staged": "^8.1.7",
-    "prettier": "^1.17.1",
-    "typescript": "^3.5.1"
+    "@types/node-fetch": "^2.3.7",
+    "husky": "^3.0.0",
+    "lint-staged": "^9.2.0",
+    "prettier": "^1.18.2",
+    "typescript": "^3.5.3"
+  },
+  "prettier": {
+    "useTabs": true
+  },
+  "husky": {
+    "precommit": "lint-staged"
   },
   "lint-staged": {
     "*.tsx?": [
