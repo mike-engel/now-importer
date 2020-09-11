@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@zeit/integration-utils": "^0.6.4",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "normalize-url": "^4.3.0",
     "true-myth": "^3.0.0"
   },
