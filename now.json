@@ -17,7 +17,7 @@
   "builds": [
     {
       "src": "/now_importer_lambda/Cargo.toml",
-      "use": "@now/rust@canary",
+      "use": "now-rust",
       "config": { "includeFiles": ["static/*"], "maxLambdaSize": "50mb" }
     },
     {
